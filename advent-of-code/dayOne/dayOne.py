@@ -18,6 +18,18 @@ def part_one(inputs):
                 i = i + 1
     return product
 
+def part_two(inputs):
+    sum = 0
+    product = 0
+    for num in inputs:
+        for i in range(len(inputs)):
+            for x in range(len(inputs)):
+                sum = num + inputs[i] + inputs[x]
+                if sum == 2020:
+                    product = num * inputs[i] * inputs[x]
+    return product
 
-print(part_one(inputs))
+
+
+print(part_two(inputs))
         
