@@ -2,10 +2,6 @@ inputs = []
  
 with open('inputs.txt', 'r') as file:
      inputs = [line.strip('/n') for line in file]
-  
-
-
-sumTreesList = []
 
 listOfSlopes=[(1,1), (3,1), (5,1), (7,1), (1,2)]
 
