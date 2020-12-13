@@ -16,7 +16,9 @@ def calcUniqueAnswers(group):
         for answer in survey:
             if answer not in uniqueAnswers:
                 uniqueAnswers.append(answer)
-    return(len(uniqueAnswers))
+    return len(uniqueAnswers)
+
+
 
 #TODO calculate the sum of these answers
 
@@ -27,4 +29,6 @@ def calcTotalAnswers(groups):
     return numAnswers
 
 print(calcTotalAnswers(groups))
+
+
         
