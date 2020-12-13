@@ -77,4 +77,10 @@ def createIdList(inputs):
 
 thisList = createIdList(inputs)
 thisList.sort()
-print(thisList[len(thisList)-1])
+#print(thisList[len(thisList)-1])
+
+#TODO find your seat - it will be the seat plus 1 and minus one from yours is on the list
+
+for i in range(len(thisList)-1):
+    if thisList[i] + 1 != thisList[i+1]:
+        print(thisList[i], thisList[i+1])
