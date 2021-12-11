@@ -1,9 +1,10 @@
-const fs = require('fs');
-const data = fs
-    .readFileSync('inputs.txt',{encoding:'utf8', flag:'r'})
-    .split("\n\n")
-    .filter((x) => Boolean(x))
-    .map((x) =>
+const fs = require("fs");
+
+const lines = fs
+  .readFileSync("inputs.txt", { encoding: "utf-8" })
+  .split("\n\n")
+  .filter((x) => Boolean(x))
+  .map((x) =>
     x
       .replace(/[\n ,]+/g, " ")
       .trim()
@@ -11,66 +12,105 @@ const data = fs
       .map((y) => parseInt(y))
   );
 
-let [drawnNumbers, ...cards] = data;
-let calledNums = new Array();
-
-
+let [drawnNumbers, ...cards] = lines;
 
 class Card {
-    constructor(numbers){
-        this.cardSize = 5;
-        this.numbers = numbers;
-        this.numberToPosition = new Map();
-        for(let i = 0; i < this.numbers.length; i++){
-            const n = this.numbers[i];
-            this.numberToPosition.set(n, {
-                line: Math.floor(i/ this.cardSize), 
-                column: i%this.cardSize,});
-        }
-        this.lines = Array(this.cardSize).fill(0);
-        this.columns = Array(this.cardSize).fill(0);
-        this.isComplete = false;
+  constructor(numbers) {
+    this.cardSize = 5;
+    this.numbers = numbers;
+    this.numberToPosition = new Map();
+    for (let i = 0; i < this.numbers.length; i++) {
+      const n = this.numbers[i];
+      this.numberToPosition.set(n, {
+        line: Math.floor(i / this.cardSize),
+        column: i % this.cardSize,
+      });
     }
+    this.lines = Array(this.cardSize).fill(0);
+    this.columns = Array(this.cardSize).fill(0);
+    this.isComplete = false;
+    this.markedNumbers = new Set();
+  }
 
-    addMarkedNumber(number){
-        const position = this.numberToPosition.get(number);
-        if(!position){
-            return;
-        }
-        this.lines[position.line]++;
-        this.columns[position.column]++;
-        if(this.lines[position.line] == this.cardSize|| this.columns[position.column == this.cardSize]){
-            this.isComplete = true;
-        }
+  addMarkedNumber(number) {
+    const position = this.numberToPosition.get(number);
+    if (!position) {
+      return;
     }
+    this.markedNumbers.add(number);
+    this.lines[position.line]++;
+    this.columns[position.column]++;
+    if (
+      this.lines[position.line] === this.cardSize ||
+      this.columns[position.column] === this.cardSize
+    ) {
+      this.isComplete = true;
+    }
+  }
+
+  unmarkedNumbers() {
+    return this.numbers.filter((n) => !this.markedNumbers.has(n));
+  }
 
 }
 
-cards = cards.map((x) => new Card(x));
-console.log(cards[0]);
+function part1(_cards) {
+  let cards = _cards.map((x) => new Card(x));
 
-let winningCard;
-for(const num of drawnNumbers){
-    calledNums.push(num);
+  let winningCard;
+  const actuallyDrawn = [];
+  for (const drawn of drawnNumbers) {
     let finished = false;
-    for(card of cards){
-        card.addMarkedNumber(num);
-        if(card.isComplete){
-            finished = true;
-            winningCard = card;
-            break;
-            
-        }
-    }
-    if(finished){
+    actuallyDrawn.push(drawn);
+    for (const card of cards) {
+      card.addMarkedNumber(drawn);
+      if (card.isComplete) {
+        finished = true;
+        winningCard = card;
         break;
+      }
     }
+    if (finished) {
+      break;
+    }
+  }
+
+  const unmarkedNumbers = winningCard.unmarkedNumbers();
+
+  console.log(
+    unmarkedNumbers.reduce((a, b) => a + b, 0) * actuallyDrawn.slice(-1)
+  );
 }
 
-console.log(winningCard);
+part1(cards);
 
-let unmarkedNums = winningCard.numbers.filter(number => !calledNums.includes(number));
-console.log(unmarkedNums);
-console.log(unmarkedNums.reduce((a, b) => a + b, 0) * calledNums.slice(-1));
+function part2(_cards) {
+  let cards = _cards.map((x) => new Card(x));
 
+  let lastWinningCard;
+  let lastWinningNumber;
+  const actuallyDrawn = [];
+  for (const drawn of drawnNumbers) {
+    actuallyDrawn.push(drawn);
+    let hasIncompleteCards = false;
+    for (const card of cards) {
+      if (!card.isComplete) {
+        hasIncompleteCards = true;
+        card.addMarkedNumber(drawn);
+        if (card.isComplete) {
+          lastWinningCard = card;
+          lastWinningNumber = drawn;
+        }
+      }
+    }
+    if (!hasIncompleteCards) {
+      break;
+    }
+  }
 
+  const unmarkedNumbers = lastWinningCard.unmarkedNumbers();
+
+  console.log(unmarkedNumbers.reduce((a, b) => a + b, 0) * lastWinningNumber);
+}
+
+part2(cards);
