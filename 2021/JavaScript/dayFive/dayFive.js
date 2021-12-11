@@ -5,8 +5,8 @@ const data = fs.readFileSync('inputs.txt', {encoding:'utf8', flag:'r'})
                     x
                     .split(" -> ")
                     );
-
-diagramResult = Array(100).fill(0);
+const rowLength =10;
+diagramResult = Array(rowLength*rowLength).fill(0);
 class point{
     constructor(x,y){
         this.x = x;
@@ -42,29 +42,30 @@ for(const segment of data){
 }
 
 for(const line of lineSegmentList){
+    let biggerX = line.firstPoint.x;
+    let smallerX = line.secondPoint.x;
+    let biggerY = line.firstPoint.y;
+    let smallerY = line.secondPoint.y;
+
+    if(line.firstPoint.y < line.secondPoint.y){
+        biggerY = line.secondPoint.y;
+        smallerY = line.firstPoint.y;
+    } 
+
+    if(line.firstPoint.x < line.secondPoint.x){
+        biggerX = line.secondPoint.x;
+        smallerX = line.firstPoint.x;
+    }
     if(line.isVertical){
-        let biggerY = line.firstPoint.y;
-        let smallerY = line.secondPoint.y;
-        if(line.firstPoint.y < line.secondPoint.y){
-            biggerY = line.secondPoint.y;
-            smallerY = line.firstPoint.y;
-        } 
-        let startingIndex = line.firstPoint.x + smallerY*10;
+        let startingIndex = line.firstPoint.x + smallerY*rowLength;
         let length = biggerY - smallerY;
         for(let i = 0; i <= length; i++){
             diagramResult[startingIndex]+= 1;
-            startingIndex += 10;
+            startingIndex += rowLength;
         }
 
     }else if(line.isHorizontal){
-        console.log(line);
-        let biggerX = line.firstPoint.x;
-        let smallerX = line.secondPoint.x;
-        if(line.firstPoint.x < line.secondPoint.x){
-            biggerX = line.secondPoint.x;
-            smallerX = line.firstPoint.x;
-        }
-        let startingIndex = smallerX + line.firstPoint.y*10;
+        let startingIndex = smallerX + line.firstPoint.y*rowLength;
         let length = biggerX - smallerX;
         console.log(length);
         console.log(startingIndex);
@@ -73,9 +74,21 @@ for(const line of lineSegmentList){
             startingIndex += 1;
         }
     } else {
-
+        //finish code to handle diagonals
+        let currentX = line.firstPoint.x;
+        let currentY = line.firstPoint.y;
+        let index = currentX + (currentY*rowLength);
+        let [slopeX, slopeY] = reduce(line.secondPoint.x - line.firstPoint.x,line.secondPoint.y - line.firstPoint.y);
+        
     }
 }
 
 console.log(diagramResult.filter(x => x>=2).length);
-
+console.log(diagramResult.slice(0,10));
+function reduce(numerator,denominator){
+    var gcd = function gcd(a,b){
+      return b ? gcd(b, a%b) : a;
+    };
+    gcd = gcd(numerator,denominator);
+    return [numerator/gcd, denominator/gcd];
+  }
